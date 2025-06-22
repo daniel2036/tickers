@@ -1,0 +1,63 @@
+#tickers-grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.stock-box {
+    width:200px;
+    height:200px;
+    border:1px solid #333;
+    margin:10px;
+    padding:10px;
+    transition:background-color 0.5s;
+    background:#eee;
+}
+
+.light-red{
+    color: #f6a99f;
+}
+
+.red {
+    color: #e6331b;
+}
+
+.light-green{
+    color: #afe4a8
+}
+
+.green{
+    color: #1cbb06;
+}
+
+.gray{
+    color: #969191
+}
+
+#tickers-grid {
+    display:flex;
+    flex-wrap:wrap;
+}
+
+.stock-box {
+    width:200px;
+    height:200px;
+    border:1px solid #333;
+    margin:10px;
+    padding:10px;
+    color: black;
+}
+
+.red-flash {
+    transition:background-color 1s;
+    background-color: #f6a99f;
+}
+
+.green-flash {
+    transition:background-color 1s;
+    background-color: #afe4a8;
+}
+
+.gray-flash {
+    transition:background-color 1s;
+    background-color: #969191;
+}
