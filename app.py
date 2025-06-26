@@ -17,12 +17,16 @@ def get_stock_data():
         stock = yf.Ticker(ticker)
         info = stock.fast_info
         print(f"{ticker} fast_info:", info)
+        long_chart_data = stock.history(period='7d', interval='1d', actions=False)['Close'].tolist()
+        short_chart_data = stock.history(period='1d', interval='5m', actions=False)['Close'].tolist()
 
         # Try fast_info first
         if info and 'lastPrice' in info and 'open' in info:
             return jsonify({
                 'currentPrice': info['lastPrice'],
-                'openPrice': info['open']
+                'openPrice': info['open'],
+                'weekChartData': long_chart_data,
+                'dayChartData': short_chart_data
             })
 
         # Fallback to history() if fast_info is incomplete

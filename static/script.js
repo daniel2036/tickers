@@ -20,6 +20,7 @@ $(document).ready(function () {
     });
     updatePrices();
 
+    // add ticker to grid and store locally
     $('#add-ticker-form').submit(function (e) {
         e.preventDefault();
         var newTicker = $('#new-ticker').val().toUpperCase();
@@ -32,6 +33,7 @@ $(document).ready(function () {
         updatePrices();
     });
 
+    // remove ticker from grid
     $('#tickers-grid').on('click', '.remove-btn', function () {
         var tickerToRemove = $(this).data('ticker');
         tickers = tickers.filter(t => t !== tickerToRemove);
@@ -42,8 +44,16 @@ $(document).ready(function () {
     startUpdateCycle();
 });
 
+// Information displayed with ticker
 function addTickerToGrid(ticker) {
-    $('#tickers-grid').append(`<div id = "${ticker}" class = "stock-box"><h2>${ticker}</h2><p id = "${ticker}-price"></p><p id = "${ticker}-pct"></p><button class = "remove-btn" data-ticker="${ticker}">Remove</button></div>`)
+    $('#tickers-grid').append(`<div id = "${ticker}" class = "stock-box">
+        <h2>${ticker}</h2>
+        <p id = "${ticker}-price"></p>
+        <p id = "${ticker}-pct"></p>
+        <canvas id="${ticker}-chart-7d" width="100" height="30"></canvas>
+        <canvas id="${ticker}-chart-1d" width="100" height="30"></canvas>
+        <button class = "remove-btn" data-ticker="${ticker}">Remove</button>
+        </div>`)
 }
 
 function updatePrices() {
@@ -57,6 +67,8 @@ function updatePrices() {
             success: function (data) {
                 var changePercentage = ((data.currentPrice - data.openPrice) / data.openPrice) * 100;
                 var colorClass;
+
+                // Colors for price change
                 if (changePercentage <= -2) {
                     colorClass = 'red';
                 } else if (changePercentage >= 2) {
@@ -73,6 +85,7 @@ function updatePrices() {
                 $(`#${ticker}-price`).removeClass('red light-red gray light-green green').addClass(colorClass);
                 $(`#${ticker}-pct`).removeClass('red light-red gray light-green green').addClass(colorClass);
 
+                // Flash on price changes
                 var animationClass;
                 if (lastPrices[ticker] > data.currentPrice) {
                     animationClass = 'red-flash';
@@ -86,6 +99,72 @@ function updatePrices() {
                 setTimeout(function () {
                     $(`#${ticker}`).removeClass(animationClass);
                 }, 1000);
+
+                // Draw 7 day sparkline
+                const ctx7d = document.getElementById(`${ticker}-chart-7d`).getContext('2d');
+
+                // Destroy old chart if re-rendering
+                if (window[`${ticker}Chart7d`]) {
+                    window[`${ticker}Chart7d`].destroy();
+                }
+
+                window[`${ticker}Chart7d`] = new Chart(ctx7d, {
+                    type: 'line',
+                    data: {
+                        labels: data.weekChartData.map((_, i) => i + 1),
+                        datasets: [{
+                            data: data.weekChartData,
+                            borderColor: colorClass,
+                            borderWidth: 1,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false,
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        plugins: {
+                            legend: { display: false },
+                        },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+
+                // Draw 1 day sparkline
+                const ctx1d = document.getElementById(`${ticker}-chart-1d`).getContext('2d');
+
+                // Destroy old chart if re-rendering
+                if (window[`${ticker}Chart1d`]) {
+                    window[`${ticker}Chart1d`].destroy();
+                }
+
+                window[`${ticker}Chart1d`] = new Chart(ctx1d, {
+                    type: 'line',
+                    data: {
+                        labels: data.dayChartData.map((_, i) => i + 1),
+                        datasets: [{
+                            data: data.dayChartData,
+                            borderColor: colorClass,
+                            borderWidth: 1,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false,
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        plugins: {
+                            legend: { display: false },
+                        },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
             }
         });
     });
