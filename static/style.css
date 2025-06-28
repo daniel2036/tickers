@@ -5,7 +5,7 @@
 
 .stock-box {
     width:200px;
-    height:250px;
+    height:240px;
     border:1px solid #333;
     margin:10px;
     padding:10px;
@@ -40,7 +40,7 @@
 
 .stock-box {
     width:200px;
-    height:250px;
+    height:240px;
     border:1px solid #333;
     margin:10px;
     padding:10px;
@@ -60,4 +60,39 @@
 .gray-flash {
     transition:background-color 1s;
     background-color: #969191;
+}
+
+.stock-box h2 {
+    margin-bottom: 2px;  /* space below the ticker symbol */
+}
+
+.stock-box p {
+    margin-bottom: 10px;  /* space below price and percentage */
+}
+
+.stock-box canvas {
+    display: block;
+    margin-bottom: 10px;  /* space below each chart */
+}
+
+.stock-box button {
+    margin-top: 2px;  /* space above the remove button */
+}
+
+.chart-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.chart-row canvas {
+    max-width: 100px;
+    max-height: 30px;
+}
+
+.chart-label {
+    margin-left: 15px;
+    font-size: 0.8em;
+    color: #0c0c0c;
+    white-space: nowrap;
 }

@@ -24,13 +24,36 @@ $(document).ready(function () {
     $('#add-ticker-form').submit(function (e) {
         e.preventDefault();
         var newTicker = $('#new-ticker').val().toUpperCase();
-        if (!tickers.includes(newTicker)) {
-            tickers.push(newTicker);
-            localStorage.setItem('tickers', JSON.stringify(tickers));
-            addTickerToGrid(newTicker);
+        if (tickers.includes(newTicker)) {
+            alert(`Ticker "${newTicker}" is already added.`);
+            $('#new-ticker').val('');
+            return;
         }
-        $('#new-ticker').val('');
-        updatePrices();
+
+        // Check if it's valid by calling the server before adding
+        $.ajax({
+            url: '/get_stock_data',
+            type: 'POST',
+            data: JSON.stringify({ 'ticker': newTicker }),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (data) {
+                if (data.error) {
+                    alert(`Ticker "${newTicker}" is invalid or data unavailable.`);
+                } else {
+                    tickers.push(newTicker);
+                    localStorage.setItem('tickers', JSON.stringify(tickers));
+                    addTickerToGrid(newTicker);
+                    updatePrices();  // or just update that ticker if you prefer
+                }
+            },
+            error: function () {
+                alert(`Failed to retrieve data for ticker "${newTicker}".`);
+            },
+            complete: function () {
+                $('#new-ticker').val('');  // always clear input
+            }
+        });
     });
 
     // remove ticker from grid
@@ -50,8 +73,15 @@ function addTickerToGrid(ticker) {
         <h2>${ticker}</h2>
         <p id = "${ticker}-price"></p>
         <p id = "${ticker}-pct"></p>
-        <canvas id="${ticker}-chart-7d" width="100" height="30"></canvas>
-        <canvas id="${ticker}-chart-1d" width="100" height="30"></canvas>
+        <div class="chart-row">
+            <canvas id="${ticker}-chart-7d" width="100" height="30"></canvas>
+            <span class="chart-label">7D (1D)</span>
+        </div>
+
+        <div class="chart-row">
+            <canvas id="${ticker}-chart-1d" width="100" height="30"></canvas>
+            <span class="chart-label">Intraday (5m)</span>
+        </div>
         <button class = "remove-btn" data-ticker="${ticker}">Remove</button>
         </div>`)
 }
