@@ -9,6 +9,11 @@
     <script src = "{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body>
+    <div id="market-status" style="position: absolute; top: 10px; right: 10px; text-align: right;">
+        <div id="clock"></div>
+        <div id="date"></div>
+        <div id="market-message"></div>
+    </div>
     <form id = "add-ticker-form">
         <input type = "text" id = "new-ticker" placeholder="Add Ticker" required>
         <button type = "submit">Add</button>

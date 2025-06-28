@@ -14,6 +14,34 @@ function startUpdateCycle() {
     }, 1000)
 }
 
+function updateClockAndMarketStatus() {
+    const now = new Date();
+    const options = { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+    const timeString = now.toLocaleTimeString('en-US', options);
+    $('#clock').text(`The time in New York is: ${timeString}`);
+
+    const optionsDate = { timeZone: 'America/New_York', weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+    const dateString = now.toLocaleDateString('en-US', optionsDate);
+    $('#date').text(dateString);
+
+    const day = now.toLocaleDateString('en-US', { timeZone: 'America/New_York', weekday: 'long' });
+    const hour = parseInt(now.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: '2-digit', hour12: false }));
+    const minute = parseInt(now.toLocaleTimeString('en-US', { timeZone: 'America/New_York', minute: '2-digit' }));
+
+    const daysOpen = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    const isMarketDay = daysOpen.includes(day);
+    const isMarketHours = (hour > 9 || (hour === 9 && minute >= 0)) && (hour < 16);
+
+    if (isMarketDay && isMarketHours) {
+        $('#market-message').text('Market is OPEN').css('color', 'green');
+    } else {
+        $('#market-message').text('Market is CLOSED').css('color', 'red');
+    }
+}
+// Start the clock
+setInterval(updateClockAndMarketStatus, 1000);
+updateClockAndMarketStatus(); // initial call right away
+
 $(document).ready(function () {
     tickers.forEach(function (ticker) {
         addTickerToGrid(ticker);
